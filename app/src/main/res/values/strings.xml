@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Final Proyect1</string>
+    <string name="new_option">New Note</string>
+    <string name="edit_option">Edit Note</string>
+    <string name="remove_option">Remove Note(s)</string>
+</resources>
