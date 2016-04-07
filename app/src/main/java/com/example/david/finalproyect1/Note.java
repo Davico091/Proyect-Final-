@@ -9,6 +9,7 @@ public class Note {
     private final String content;
     private final long creationTimestamp;
     private final long modificationTimestamp;
+    private  boolean selected;
 
     public Note(long id, String title, String content, long creationTimestamp, long modificationTimestamp) {
         this.id = id;
@@ -36,5 +37,25 @@ public class Note {
 
     public long getModificationTimestamp() {
         return modificationTimestamp;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    @Override
+    public String toString() {
+        return "Note{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", creationTimestamp=" + creationTimestamp +
+                ", modificationTimestamp=" + modificationTimestamp +
+                ", selected=" + selected +
+                '}';
     }
 }

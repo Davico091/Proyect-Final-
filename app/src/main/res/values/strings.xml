@@ -3,4 +3,8 @@
     <string name="new_option">New Note</string>
     <string name="edit_option">Edit Note</string>
     <string name="remove_option">Remove Note(s)</string>
+    <string name="hint_form_title">Title...</string>
+    <string name="hint_form_content">Content...</string>
+    <string name="button_form_save">Save</string>
+    <string name="button_form_cancel">Cancel</string>
 </resources>
