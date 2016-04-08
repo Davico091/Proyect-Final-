@@ -60,11 +60,8 @@ public class ListFragment extends Fragment {
         listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-
-                Log.v("presiono ", "presiono ");
-                mode.setTitle(listView.getCheckedItemCount() + " Notes selected");
+                mode.setTitle(getString(R.string.message_items_selected,listView.getCheckedItemCount()));
                 list_items_selected.add(list_items.get(position));
-
             }
 
             @Override
@@ -85,8 +82,7 @@ public class ListFragment extends Fragment {
                     case R.id.remove_option:
                         removeOption(list_items_selected);
                         mode.finish();
-                        String message = list_items_selected.size()+ " Notes removed";
-                        Util.showMessage(getActivity(),message);
+                        Util.showMessage(getActivity(),getString(R.string.message_item_removed));
                         return  true;
                     default:
                         return false;
@@ -112,6 +108,7 @@ public class ListFragment extends Fragment {
         listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                list_items_selected = new ArrayList<>();
                 return true;
             }
 
@@ -146,8 +143,10 @@ public class ListFragment extends Fragment {
         public void onSelectedNote(final Note note);
     }
     private void removeOption(ArrayList<Note> list_items_selected) {
+        int count =0;
         for(Note note : list_items_selected){
             noteAdapter.remove(note);
+            count++;
         }
     }
 

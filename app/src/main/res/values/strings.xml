@@ -9,4 +9,6 @@
     <string name="button_form_cancel">Cancel</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
+    <string name="message_item_removed">Notes removed</string>
+    <string name="message_items_selected"> %s Notes selected</string>
 </resources>
