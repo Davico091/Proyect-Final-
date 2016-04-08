@@ -7,9 +7,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -30,13 +35,17 @@ public class ListFragment extends Fragment {
 
     private final static int TEST_NOTES_SIZE = 100;
     private ListView listView;
+    private ArrayList<Note> list_items;
+    private ArrayList<Note> list_items_selected = new ArrayList<>();
     private ListFragmentInterface listFragmentInterface;
+    private NoteAdapter noteAdapter;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_list,container,false);
         listView = (ListView)view.findViewById(R.id.listview_elements);
+        noteAdapter =new NoteAdapter(getContext(), getTestData(TEST_NOTES_SIZE));
         return view;
     }
 
@@ -44,99 +53,109 @@ public class ListFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        listView.setAdapter(new NoteAdapter(getContext(), getTestData(TEST_NOTES_SIZE)));
+
+        listView.setAdapter(noteAdapter);
+        listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
+        listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
+            @Override
+            public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
+
+                Log.v("presiono ", "presiono ");
+                mode.setTitle(listView.getCheckedItemCount() + " Notes selected");
+                list_items_selected.add(list_items.get(position));
+
+            }
+
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                MenuInflater menuInflater = mode.getMenuInflater();
+                menuInflater.inflate(R.menu.main, menu);
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                return false;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    case R.id.remove_option:
+                        removeOption(list_items_selected);
+                        mode.finish();
+                        String message = list_items_selected.size()+ " Notes removed";
+                        Util.showMessage(getActivity(),message);
+                        return  true;
+                    default:
+                        return false;
+                }
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+
+            }
+        });
+
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(listFragmentInterface!=null){
-                    listFragmentInterface.onSelectedNote(((NoteAdapter)parent.getAdapter()).getItem(position));
+                if (listFragmentInterface != null) {
+                    listFragmentInterface.onSelectedNote(((NoteAdapter) parent.getAdapter()).getItem(position));
                 }
             }
         });
 
-    }
+        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                return true;
+            }
 
+        });
+
+    }
     private ArrayList<Note> getTestData(final int size){
-        final ArrayList<Note> notes = new ArrayList<>();
-        for (int i =0;i<size;i++){
-            final Note note = new Note(i+1,"Title "+(i+1),"Content "+(i+1),System.currentTimeMillis(),System.currentTimeMillis());
-            notes.add(note);
+
+        if(list_items!=null){
+            return list_items;
         }
-        return notes;
+        else {
+            list_items = new ArrayList<>();
+            for (int i =0;i<size;i++){
+                final Note note = new Note(i+1,"Title "+(i+1),"Content "+(i+1),System.currentTimeMillis(),System.currentTimeMillis());
+                list_items.add(note);
+            }
+            return list_items;
+        }
     }
 
     public void setListFragmentInterface(final ListFragmentInterface listFragmentInterface){
         this.listFragmentInterface=listFragmentInterface;
     }
 
-    public static class NoteAdapter extends ArrayAdapter<Note>{
-
-        private final List<Note> notes;
-        private final LayoutInflater layoutInflater;
-//        boolean[] checkboxState = new boolean[notes.size()];
-
-        NoteAdapter(final Context context, List<Note> notes){
-            super(context,0,notes);
-            this.notes=notes;
-            layoutInflater =LayoutInflater.from(getContext());
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-
-            View vi=convertView;
-            CustomHolder customHolder =null;
-
-            if(convertView ==null){
-                vi = layoutInflater.inflate(R.layout.note_element,parent,false);
-                customHolder = new CustomHolder();
-                customHolder.checkboxItem = (CheckBox)vi.findViewById(R.id.checkbox_item);
-                customHolder.date =(TextView)vi.findViewById(R.id.note_creation_date);
-                customHolder.title=(TextView)vi.findViewById(R.id.note_title);
-
-                customHolder.checkboxItem.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        int getPosition = (Integer)buttonView.getTag();
-                        notes.get(getPosition).setSelected(buttonView.isChecked());
-
-                    }
-                });
-
-
-                vi.setTag(customHolder);
-                vi.setTag(R.id.note_title, customHolder.title);
-                vi.setTag(R.id.note_creation_date, customHolder.date);
-                vi.setTag(R.id.checkbox_item,customHolder.checkboxItem);
-
-
-            }
-            else {
-                customHolder = (CustomHolder)vi.getTag();
-
-            }
-
-
-            customHolder.checkboxItem.setTag(position);
-
-            final Note note= getItem(position);
-            customHolder.title.setText(note.getTitle());
-            customHolder.date.setText(String.valueOf(note.getCreationTimestamp()));
-            customHolder.checkboxItem.setChecked(notes.get(position).isSelected());
-
-            return vi;
-        }
-
-        public class CustomHolder{
-            TextView title;
-            TextView date;
-            CheckBox checkboxItem;
-        }
-
+    public void addNewNote() {
+        Note note = new Note(1,"titulo nuevo","contenido nuevo",System.currentTimeMillis(),System.currentTimeMillis());
+        noteAdapter.add(note);
     }
 
     public static interface ListFragmentInterface {
         public void onSelectedNote(final Note note);
     }
+    private void removeOption(ArrayList<Note> list_items_selected) {
+        for(Note note : list_items_selected){
+            noteAdapter.remove(note);
+        }
+    }
 
+    public NoteAdapter getNoteAdapter() {
+        return noteAdapter;
+    }
+
+    public void setNoteAdapter(NoteAdapter noteAdapter) {
+        this.noteAdapter = noteAdapter;
+    }
 }

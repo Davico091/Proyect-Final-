@@ -2,7 +2,10 @@ package com.example.david.finalproyect1;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.net.Uri;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -26,23 +29,17 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
 
     public static final String LIST_FRAGMENT_TAG = "list_fragment";
     public static final String CONTENT_FRAGMENT_TAG = "content_fragment";
-    private Button buttonFromSave;
-    private ListView listViewItems ;
     final Context context = this;
-
+    private ListFragment listFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        buttonFromSave = (Button)findViewById(R.id.button_form_save);
-        listViewItems = (ListView)findViewById(R.id.listview_elements);
         fragmentManager = getSupportFragmentManager();
         if (savedInstanceState == null) {
-            final ListFragment listFragment = new ListFragment();
+            listFragment = new ListFragment();
             fragmentManager.beginTransaction().replace(R.id.fragment_container, listFragment, LIST_FRAGMENT_TAG).commit();
             listFragment.setListFragmentInterface(this);
         } else {
@@ -52,29 +49,33 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
             }
         }
 
-    }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        assert fab != null;
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater layoutInflater = LayoutInflater.from(context);
+                View dialogView = layoutInflater.inflate(R.layout.note_form, null);
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        switch (id) {
-            case R.id.new_option:
-                newOption();
-                break;
-            case R.id.edit_option:
-                editOption();
-                break;
-            case R.id.remove_option:
-                removeOption();
-                break;
-        }
-        return super.onOptionsItemSelected(item);
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        listFragment.addNewNote();
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                    }
+                });
+                builder.setView(dialogView);
+                builder.create();
+                builder.show();
+            }
+        });
     }
 
     @Override
@@ -84,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
     }
 
     private void newOption() {
-        showMessage("New");
+       Util.showMessage(this, "New");
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View dialogView = layoutInflater.inflate(R.layout.note_form, null);
 
@@ -94,19 +95,5 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
         builder.create();
         builder.show();
     }
-
-    private void editOption() {
-        showMessage("Edit");
-    }
-
-    private void removeOption() {
-        showMessage("Remove");
-    }
-
-    private void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-    }
-
-
 
 }

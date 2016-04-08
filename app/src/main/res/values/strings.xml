@@ -7,4 +7,6 @@
     <string name="hint_form_content">Content...</string>
     <string name="button_form_save">Save</string>
     <string name="button_form_cancel">Cancel</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
 </resources>

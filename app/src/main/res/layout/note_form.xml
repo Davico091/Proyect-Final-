@@ -20,22 +20,4 @@
         android:gravity="top"
         android:hint="@string/hint_form_content"
         />
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="horizontal">
-        <Button
-            android:id="@+id/button_form_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_form_save"
-            />
-        <Button
-            android:id="@+id/button_form_cancel_"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_form_cancel"
-            />
-    </LinearLayout>
 </LinearLayout>
