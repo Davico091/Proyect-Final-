@@ -16,7 +16,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EdgeEffect;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -49,33 +52,6 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
             }
         }
 
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        assert fab != null;
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LayoutInflater layoutInflater = LayoutInflater.from(context);
-                View dialogView = layoutInflater.inflate(R.layout.note_form, null);
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        listFragment.addNewNote();
-                    }
-                });
-                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                    }
-                });
-                builder.setView(dialogView);
-                builder.create();
-                builder.show();
-            }
-        });
     }
 
     @Override
@@ -85,7 +61,6 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
     }
 
     private void newOption() {
-       Util.showMessage(this, "New");
         LayoutInflater layoutInflater = LayoutInflater.from(context);
         View dialogView = layoutInflater.inflate(R.layout.note_form, null);
 

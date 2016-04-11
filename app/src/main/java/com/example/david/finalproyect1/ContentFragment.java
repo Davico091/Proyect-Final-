@@ -3,19 +3,24 @@ package com.example.david.finalproyect1;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 /**
  * Created by David on 05/04/2016.
  */
-public class ContentFragment extends Fragment {
+public class ContentFragment extends Fragment implements View.OnClickListener{
 
     private TextView textViewTitle;
     private TextView textViewDate;
     private TextView textViewContent;
+    private Button buttonEdit;
 
     public static ContentFragment newInstance(Note note){
         final ContentFragment contentFragment = new ContentFragment();
@@ -32,9 +37,11 @@ public class ContentFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_content,container,false);
-        textViewTitle =(TextView)view.findViewById(R.id.content_fragment_title);
+        textViewTitle =(EditText)view.findViewById(R.id.content_fragment_title);
         textViewDate =(TextView)view.findViewById(R.id.content_fragment_date);
-        textViewContent =(TextView)view.findViewById(R.id.content_fragment_content);
+        textViewContent =(EditText)view.findViewById(R.id.content_fragment_content);
+        buttonEdit = (Button)view.findViewById(R.id.button_edit_note);
+        buttonEdit.setOnClickListener(this);
         return view;
     }
 
@@ -49,5 +56,12 @@ public class ContentFragment extends Fragment {
         textViewTitle.setText(arguments.getString("title"));
         textViewContent.setText(arguments.getString("content"));
         textViewDate.setText(String.valueOf(arguments.getLong("creationTimestamp")));
+    }
+
+    @Override
+    public void onClick(View v) {
+       if(v.getId()==R.id.button_edit_note){
+
+       }
     }
 }

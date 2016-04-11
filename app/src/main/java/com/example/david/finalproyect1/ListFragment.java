@@ -1,9 +1,12 @@
 package com.example.david.finalproyect1;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Debug;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,6 +22,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,7 +49,46 @@ public class ListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_list,container,false);
         listView = (ListView)view.findViewById(R.id.listview_elements);
-        noteAdapter =new NoteAdapter(getContext(), getTestData(TEST_NOTES_SIZE));
+
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        assert fab != null;
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+                View dialogView = layoutInflater.inflate(R.layout.note_form, null);
+                final EditText editTextTitle = (EditText) dialogView.findViewById(R.id.note_form_title);
+                final EditText editTextContent = (EditText) dialogView.findViewById(R.id.note_form_content);
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+
+                builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        addNewNote(editTextTitle.getText().toString(), editTextContent.getText().toString());
+                    }
+                });
+                builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                builder.setView(dialogView);
+                builder.create();
+                builder.show();
+            }
+        });
+
+        if(list_items==null){
+            list_items = new ArrayList<Note>();
+            noteAdapter =new NoteAdapter(getContext(), list_items);
+        }
+        else {
+
+        }
+
+
         return view;
     }
 
@@ -115,33 +158,15 @@ public class ListFragment extends Fragment {
         });
 
     }
-    private ArrayList<Note> getTestData(final int size){
-
-        if(list_items!=null){
-            return list_items;
-        }
-        else {
-            list_items = new ArrayList<>();
-            for (int i =0;i<size;i++){
-                final Note note = new Note(i+1,"Title "+(i+1),"Content "+(i+1),System.currentTimeMillis(),System.currentTimeMillis());
-                list_items.add(note);
-            }
-            return list_items;
-        }
-    }
-
     public void setListFragmentInterface(final ListFragmentInterface listFragmentInterface){
         this.listFragmentInterface=listFragmentInterface;
     }
 
-    public void addNewNote() {
-        Note note = new Note(1,"titulo nuevo","contenido nuevo",System.currentTimeMillis(),System.currentTimeMillis());
+    public void addNewNote(String title,String content) {
+        Note note = new Note(1,title,content,System.currentTimeMillis(),System.currentTimeMillis());
         noteAdapter.add(note);
     }
 
-    public static interface ListFragmentInterface {
-        public void onSelectedNote(final Note note);
-    }
     private void removeOption(ArrayList<Note> list_items_selected) {
         int count =0;
         for(Note note : list_items_selected){
@@ -156,5 +181,8 @@ public class ListFragment extends Fragment {
 
     public void setNoteAdapter(NoteAdapter noteAdapter) {
         this.noteAdapter = noteAdapter;
+    }
+    public static interface ListFragmentInterface {
+        public void onSelectedNote(final Note note);
     }
 }
