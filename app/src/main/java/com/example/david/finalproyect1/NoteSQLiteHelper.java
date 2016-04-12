@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public class NoteSQLiteHelper extends SQLiteOpenHelper {
 
-    String sqlCreate ="CREATE TABLE DBNOTE (id INTEGER,title TEXT,content TEXT,date TEXT)";
+    String sqlCreate ="CREATE TABLE DBNOTE (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT,content TEXT)";
 
 
     public NoteSQLiteHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -24,5 +24,6 @@ public class NoteSQLiteHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS DBNOTE");
+        db.execSQL(sqlCreate);
     }
 }

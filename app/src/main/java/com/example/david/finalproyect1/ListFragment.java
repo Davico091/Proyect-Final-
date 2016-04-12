@@ -1,6 +1,7 @@
 package com.example.david.finalproyect1;
 
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
@@ -42,23 +43,23 @@ public class ListFragment extends Fragment implements View.OnClickListener{
     private final static int TEST_NOTES_SIZE = 100;
     private ListView listView;
     private ArrayList<Note> list_items;
-    private ArrayList<Note> list_items_selected = new ArrayList<>();
+    private ArrayList<Note> list_items_selected;
     private ListFragmentInterface listFragmentInterface;
     private NoteAdapter noteAdapter;
-
+    NoteSQLiteHelper noteSQLiteHelper ;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = inflater.inflate(R.layout.fragment_list,container,false);
+        final View view = inflater.inflate(R.layout.fragment_list, container, false);
         listView = (ListView)view.findViewById(R.id.listview_elements);
+        list_items_selected = new ArrayList<>();
+        noteSQLiteHelper = new NoteSQLiteHelper(getActivity().getApplicationContext(),Util.DBNAME,null,1);
+
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         assert fab != null;
         fab.setOnClickListener(this);
-        if(list_items==null){
-            list_items = new ArrayList<Note>();
-
-            noteAdapter =new NoteAdapter(getContext(), list_items);
-        }
+        list_items = getDBNotes();
+        noteAdapter =new NoteAdapter(getContext(),list_items);
         return view;
     }
     @Override
@@ -96,7 +97,7 @@ public class ListFragment extends Fragment implements View.OnClickListener{
             }
             @Override
             public void onDestroyActionMode(ActionMode mode) {
-
+                list_items_selected = new ArrayList<Note>();
             }
         });
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -122,15 +123,26 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         this.listFragmentInterface=listFragmentInterface;
     }
     public void addNewNote(String title,String content) {
-        Note note = new Note(1,title,content,System.currentTimeMillis(),System.currentTimeMillis());
-        noteAdapter.add(note);
+        SQLiteDatabase db = noteSQLiteHelper.getWritableDatabase();
+        ContentValues new_note = new ContentValues();
+        new_note.put("title", title);
+        new_note.put("content", content);
+        db.insert("DBNOTE", null, new_note);
+        db.close();
+        noteAdapter.clear();
+        noteAdapter.addAll(getDBNotes());
     }
     private void removeOption(ArrayList<Note> list_items_selected) {
         int count =0;
+        noteAdapter.clear();
+        noteSQLiteHelper = new NoteSQLiteHelper(getActivity().getApplicationContext(),Util.DBNAME,null,1);
+        SQLiteDatabase db = noteSQLiteHelper.getWritableDatabase();
         for(Note note : list_items_selected){
-            noteAdapter.remove(note);
+            db.delete(Util.DBNAME, "id="+note.getId(), null);
             count++;
         }
+        noteAdapter.addAll(getDBNotes());
+        db.close();
     }
     public NoteAdapter getNoteAdapter() {
         return noteAdapter;
@@ -172,14 +184,17 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         public void onSelectedNote(final Note note);
     }
     public ArrayList<Note> getDBNotes(){
-        NoteSQLiteHelper noteSQLiteHelper = new NoteSQLiteHelper(getContext(),"DBNOTE",null,1);
+        noteSQLiteHelper = new NoteSQLiteHelper(getActivity().getApplicationContext(),Util.DBNAME,null,1);
         SQLiteDatabase db = noteSQLiteHelper.getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM DBNOTE", null);
         ArrayList<Note> notes = new ArrayList<>();
+
         while (cursor.moveToNext()){
             Note note = new Note(cursor.getInt(0),cursor.getString(1),cursor.getString(2),System.currentTimeMillis(),System.currentTimeMillis());
             notes.add(note);
         }
+        db.close();
+
         return notes;
     }
 }

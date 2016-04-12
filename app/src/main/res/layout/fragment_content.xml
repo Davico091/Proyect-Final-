@@ -32,4 +32,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/edit_option"/>
+    <TextView
+        android:id="@+id/content_fragment_id"
+        android:visibility="invisible"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 </LinearLayout>
