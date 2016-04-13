@@ -33,6 +33,7 @@ import android.widget.Toast;
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -53,12 +54,11 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         final View view = inflater.inflate(R.layout.fragment_list, container, false);
         listView = (ListView)view.findViewById(R.id.listview_elements);
         list_items_selected = new ArrayList<>();
-        noteSQLiteHelper = new NoteSQLiteHelper(getActivity().getApplicationContext(),Util.DBNAME,null,1);
-
+        noteSQLiteHelper = new NoteSQLiteHelper(getContext());
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         assert fab != null;
         fab.setOnClickListener(this);
-        list_items = getDBNotes();
+        list_items = noteSQLiteHelper.getDBNotes();
         noteAdapter =new NoteAdapter(getContext(),list_items);
         return view;
     }
@@ -123,26 +123,13 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         this.listFragmentInterface=listFragmentInterface;
     }
     public void addNewNote(String title,String content) {
-        SQLiteDatabase db = noteSQLiteHelper.getWritableDatabase();
-        ContentValues new_note = new ContentValues();
-        new_note.put("title", title);
-        new_note.put("content", content);
-        db.insert("DBNOTE", null, new_note);
-        db.close();
+       noteSQLiteHelper.addNewNote(new Note());
         noteAdapter.clear();
-        noteAdapter.addAll(getDBNotes());
+        noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
     }
     private void removeOption(ArrayList<Note> list_items_selected) {
-        int count =0;
         noteAdapter.clear();
-        noteSQLiteHelper = new NoteSQLiteHelper(getActivity().getApplicationContext(),Util.DBNAME,null,1);
-        SQLiteDatabase db = noteSQLiteHelper.getWritableDatabase();
-        for(Note note : list_items_selected){
-            db.delete(Util.DBNAME, "id="+note.getId(), null);
-            count++;
-        }
-        noteAdapter.addAll(getDBNotes());
-        db.close();
+        noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
     }
     public NoteAdapter getNoteAdapter() {
         return noteAdapter;
@@ -183,18 +170,5 @@ public class ListFragment extends Fragment implements View.OnClickListener{
     public static interface ListFragmentInterface {
         public void onSelectedNote(final Note note);
     }
-    public ArrayList<Note> getDBNotes(){
-        noteSQLiteHelper = new NoteSQLiteHelper(getActivity().getApplicationContext(),Util.DBNAME,null,1);
-        SQLiteDatabase db = noteSQLiteHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM DBNOTE", null);
-        ArrayList<Note> notes = new ArrayList<>();
 
-        while (cursor.moveToNext()){
-            Note note = new Note(cursor.getInt(0),cursor.getString(1),cursor.getString(2),System.currentTimeMillis(),System.currentTimeMillis());
-            notes.add(note);
-        }
-        db.close();
-
-        return notes;
-    }
 }

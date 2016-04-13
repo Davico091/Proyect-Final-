@@ -47,7 +47,7 @@ public class ContentFragment extends Fragment implements View.OnClickListener{
         textViewDate =(TextView)view.findViewById(R.id.content_fragment_date);
         textViewContent =(EditText)view.findViewById(R.id.content_fragment_content);
         textViewId =(TextView)view.findViewById(R.id.content_fragment_id);
-        noteSQLiteHelper = new NoteSQLiteHelper(getActivity().getApplicationContext(),Util.DBNAME,null,1);
+        noteSQLiteHelper = new NoteSQLiteHelper(getActivity().getApplicationContext());
         buttonEdit = (Button)view.findViewById(R.id.button_edit_note);
         buttonEdit.setOnClickListener(this);
         return view;
@@ -75,7 +75,6 @@ public class ContentFragment extends Fragment implements View.OnClickListener{
     }
     private void editNote(){
 
-        noteSQLiteHelper = new NoteSQLiteHelper(getActivity().getApplicationContext(),Util.DBNAME,null,1);
         SQLiteDatabase db = noteSQLiteHelper.getWritableDatabase();
         ContentValues note = new ContentValues();
 

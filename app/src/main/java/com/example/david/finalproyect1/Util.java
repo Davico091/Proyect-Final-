@@ -15,15 +15,15 @@ public class Util {
     public static void showMessage(Context context,String message){
         Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
     }
-    public static String parseDate(String inputDate){
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/YYYY");
-        Date date = null;
+    public static String parseDate(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        String fecha=null;
         try{
-             date = sdf.parse(inputDate);
+              fecha = sdf.format(date);
         }
         catch (Exception e){
             Log.v("Error parse date","Error parse date");
         }
-    return sdf.format(date);
+    return fecha;
     }
 }
