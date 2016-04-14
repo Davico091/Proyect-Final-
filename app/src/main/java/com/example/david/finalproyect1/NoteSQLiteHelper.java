@@ -24,7 +24,7 @@ public class NoteSQLiteHelper extends SQLiteOpenHelper {
     }
 
     public NoteSQLiteHelper(Context context) {
-        super(context, Util.DBNAME, null, 1);
+        super(context, Util.DBNAME, null, 2);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class NoteSQLiteHelper extends SQLiteOpenHelper {
         ArrayList<Note> notes = new ArrayList<>();
 
         while (cursor.moveToNext()){
-            Note note = new Note(cursor.getInt(0),cursor.getString(1),cursor.getString(2),System.currentTimeMillis(),System.currentTimeMillis());
+            Note note = new Note(cursor.getInt(0),cursor.getString(1),cursor.getString(2),cursor.getString(3));
             notes.add(note);
         }
         db.close();

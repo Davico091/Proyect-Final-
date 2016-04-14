@@ -123,7 +123,7 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         this.listFragmentInterface=listFragmentInterface;
     }
     public void addNewNote(String title,String content) {
-       noteSQLiteHelper.addNewNote(new Note());
+        noteSQLiteHelper.addNewNote(new Note(0,title,content,null));
         noteAdapter.clear();
         noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
     }

@@ -33,7 +33,7 @@ public class ContentFragment extends Fragment implements View.OnClickListener{
         params.putLong("id", note.getId());
         params.putString("title",note.getTitle());
         params.putString("content", note.getContent());
-        params.putLong("creationTimestamp", note.getCreationTimestamp());
+        params.putString("date", note.getDate());
         contentFragment.setArguments(params);
         return contentFragment;
     }
@@ -64,7 +64,7 @@ public class ContentFragment extends Fragment implements View.OnClickListener{
         textViewId.setText(String.valueOf(arguments.getLong("id")));
         textViewTitle.setText(arguments.getString("title"));
         textViewContent.setText(arguments.getString("content"));
-        textViewDate.setText(String.valueOf(arguments.getLong("creationTimestamp")));
+        textViewDate.setText(String.valueOf(arguments.getString("date")));
     }
 
     @Override

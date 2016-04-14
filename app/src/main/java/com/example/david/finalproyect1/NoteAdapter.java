@@ -51,7 +51,7 @@ public class NoteAdapter extends ArrayAdapter<Note> {
 
         final Note note= getItem(position);
         customHolder.title.setText(note.getTitle());
-        customHolder.date.setText(String.valueOf(note.getCreationTimestamp()));
+        customHolder.date.setText(note.getDate());
 
         return vi;
     }
