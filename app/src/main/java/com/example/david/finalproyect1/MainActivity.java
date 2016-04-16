@@ -11,6 +11,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,41 +35,54 @@ public class MainActivity extends AppCompatActivity implements ListFragment.List
     public static final String CONTENT_FRAGMENT_TAG = "content_fragment";
     final Context context = this;
     private ListFragment listFragment;
+    public boolean isLargeView = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        fragmentManager = getSupportFragmentManager();
-        if (savedInstanceState == null) {
-            listFragment = new ListFragment();
-            fragmentManager.beginTransaction().replace(R.id.fragment_container, listFragment, LIST_FRAGMENT_TAG).commit();
-            listFragment.setListFragmentInterface(this);
-        } else {
-            final Fragment fragment = fragmentManager.findFragmentByTag(LIST_FRAGMENT_TAG);
-            if (fragment != null) {
-                ((ListFragment) fragment).setListFragmentInterface(this);
-            }
+        if(findViewById(R.id.fragment_container_list_large)!=null){
+            isLargeView = true;
         }
+
+        fragmentManager = getSupportFragmentManager();
+
+            if (savedInstanceState == null) {
+
+                listFragment = new ListFragment();
+                if(isLargeView){
+                    fragmentManager.beginTransaction().add(R.id.fragment_container_list_large, listFragment, LIST_FRAGMENT_TAG).commit();
+                    final ContentFragment contentFragment = ContentFragment.newInstance(new Note());
+                    fragmentManager.beginTransaction().add(R.id.fragment_container_content_large, contentFragment, CONTENT_FRAGMENT_TAG).commit();
+                }
+                else{
+                    fragmentManager.beginTransaction().replace(R.id.fragment_container, listFragment, LIST_FRAGMENT_TAG).commit();
+                }
+
+                listFragment.setListFragmentInterface(this);
+            } else {
+                final Fragment fragment = fragmentManager.findFragmentByTag(LIST_FRAGMENT_TAG);
+                if (fragment != null) {
+                    ((ListFragment) fragment).setListFragmentInterface(this);
+                }
+            }
+
+
 
     }
 
     @Override
     public void onSelectedNote(Note note) {
         final ContentFragment contentFragment = ContentFragment.newInstance(note);
-        fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, contentFragment, CONTENT_FRAGMENT_TAG).commit();
+        if(isLargeView){
+            fragmentManager.beginTransaction().replace(R.id.fragment_container, contentFragment, CONTENT_FRAGMENT_TAG).commit();
+        }
+        else {
+            fragmentManager.beginTransaction().addToBackStack(null).replace(R.id.fragment_container, contentFragment, CONTENT_FRAGMENT_TAG).commit();
+        }
+
     }
 
-    private void newOption() {
-        LayoutInflater layoutInflater = LayoutInflater.from(context);
-        View dialogView = layoutInflater.inflate(R.layout.note_form, null);
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-
-        builder.setView(dialogView);
-        builder.create();
-        builder.show();
-    }
 
 }

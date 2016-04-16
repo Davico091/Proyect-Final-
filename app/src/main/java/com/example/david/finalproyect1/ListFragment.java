@@ -167,6 +167,10 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         builder.create();
         builder.show();
     }
+    public void updateList(){
+        noteAdapter.clear();
+        noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
+    }
     public static interface ListFragmentInterface {
         public void onSelectedNote(final Note note);
     }

@@ -5,12 +5,15 @@ package com.example.david.finalproyect1;
  */
 public class Note {
 
-    private final long id;
-    private final String title;
-    private final String content;
-    private final String date;
+    private  long id;
+    private  String title;
+    private  String content;
+    private  String date;
     private  boolean selected;
 
+    public Note(){
+
+    }
     public Note(long id, String title, String content,String date) {
         this.id = id;
         this.title = title;

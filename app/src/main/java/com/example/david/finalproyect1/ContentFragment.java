@@ -83,7 +83,12 @@ public class ContentFragment extends Fragment implements View.OnClickListener{
        int status= db.update(Util.DBNAME,note,"id = "+textViewId.getText().toString(),null);
         db.close();
         if(status>0){
+            if(((MainActivity)getActivity()).isLargeView){
+                ListFragment listFragment = (ListFragment)getActivity().getSupportFragmentManager().findFragmentByTag(MainActivity.LIST_FRAGMENT_TAG);
+                listFragment.updateList();
+            }
          Util.showMessage(getContext(),"Note edited");
+
         }
     }
 }
