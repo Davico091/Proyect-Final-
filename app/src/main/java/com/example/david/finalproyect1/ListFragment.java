@@ -128,6 +128,7 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
     }
     private void removeOption(ArrayList<Note> list_items_selected) {
+        noteSQLiteHelper.deleteNote(list_items_selected);
         noteAdapter.clear();
         noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
     }
