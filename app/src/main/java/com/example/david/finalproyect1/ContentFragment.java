@@ -1,18 +1,13 @@
 package com.example.david.finalproyect1;
 
-import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 
 /**
@@ -30,10 +25,7 @@ public class ContentFragment extends Fragment implements View.OnClickListener{
     public static ContentFragment newInstance(Note note){
         final ContentFragment contentFragment = new ContentFragment();
         final Bundle params = new Bundle();
-        params.putLong("id", note.getId());
-        params.putString("title",note.getTitle());
-        params.putString("content", note.getContent());
-        params.putString("date", note.getDate());
+        params.putParcelable("note", note);
         contentFragment.setArguments(params);
         return contentFragment;
     }
@@ -46,7 +38,6 @@ public class ContentFragment extends Fragment implements View.OnClickListener{
         textViewTitle =(EditText)view.findViewById(R.id.content_fragment_title);
         textViewDate =(TextView)view.findViewById(R.id.content_fragment_date);
         textViewContent =(EditText)view.findViewById(R.id.content_fragment_content);
-        textViewId =(TextView)view.findViewById(R.id.content_fragment_id);
         noteSQLiteHelper = new NoteSQLiteHelper(getActivity().getApplicationContext());
         buttonEdit = (Button)view.findViewById(R.id.button_edit_note);
         buttonEdit.setOnClickListener(this);
@@ -61,10 +52,10 @@ public class ContentFragment extends Fragment implements View.OnClickListener{
 
     private void showNote(){
         final Bundle arguments = getArguments();
-        textViewId.setText(String.valueOf(arguments.getLong("id")));
-        textViewTitle.setText(arguments.getString("title"));
-        textViewContent.setText(arguments.getString("content"));
-        textViewDate.setText(String.valueOf(arguments.getString("date")));
+        Note note = arguments.getParcelable("note");
+        textViewTitle.setText(note.getTitle());
+        textViewContent.setText(note.getContent());
+        textViewDate.setText(note.getDate());
     }
 
     @Override
@@ -75,13 +66,10 @@ public class ContentFragment extends Fragment implements View.OnClickListener{
     }
     private void editNote(){
 
-        SQLiteDatabase db = noteSQLiteHelper.getWritableDatabase();
-        ContentValues note = new ContentValues();
-
-        note.put("content",textViewContent.getText().toString());
-        note.put("title", textViewTitle.getText().toString());
-       int status= db.update(Util.DBNAME,note,"id = "+textViewId.getText().toString(),null);
-        db.close();
+        long id = ((Note)getArguments().getParcelable("note")).get_id();
+        String title = textViewTitle.getText().toString();
+        String content = textViewContent.getText().toString();
+        int status=  noteSQLiteHelper.editNote(new Note(id,title,content,""));
         if(status>0){
             if(((MainActivity)getActivity()).isLargeView){
                 ListFragment listFragment = (ListFragment)getActivity().getSupportFragmentManager().findFragmentByTag(MainActivity.LIST_FRAGMENT_TAG);

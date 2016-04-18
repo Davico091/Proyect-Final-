@@ -48,9 +48,11 @@ public class ListFragment extends Fragment implements View.OnClickListener{
     private ListFragmentInterface listFragmentInterface;
     private NoteAdapter noteAdapter;
     NoteSQLiteHelper noteSQLiteHelper ;
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         final View view = inflater.inflate(R.layout.fragment_list, container, false);
         listView = (ListView)view.findViewById(R.id.listview_elements);
         list_items_selected = new ArrayList<>();
@@ -67,6 +69,7 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         super.onActivityCreated(savedInstanceState);
         listView.setAdapter(noteAdapter);
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
+
         listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
@@ -122,21 +125,17 @@ public class ListFragment extends Fragment implements View.OnClickListener{
     public void setListFragmentInterface(final ListFragmentInterface listFragmentInterface){
         this.listFragmentInterface=listFragmentInterface;
     }
+
     public void addNewNote(String title,String content) {
         noteSQLiteHelper.addNewNote(new Note(0,title,content,null));
         noteAdapter.clear();
         noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
     }
+
     private void removeOption(ArrayList<Note> list_items_selected) {
         noteSQLiteHelper.deleteNote(list_items_selected);
         noteAdapter.clear();
         noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
-    }
-    public NoteAdapter getNoteAdapter() {
-        return noteAdapter;
-    }
-    public void setNoteAdapter(NoteAdapter noteAdapter) {
-        this.noteAdapter = noteAdapter;
     }
 
     @Override
@@ -146,6 +145,7 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         }
     }
     public void showDialog(){
+
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         View dialogView = layoutInflater.inflate(R.layout.note_form, null);
         final EditText editTextTitle = (EditText) dialogView.findViewById(R.id.note_form_title);
@@ -155,7 +155,6 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
                 addNewNote(editTextTitle.getText().toString(), editTextContent.getText().toString());
             }
         });

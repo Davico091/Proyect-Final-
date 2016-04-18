@@ -11,12 +11,14 @@ import java.util.Date;
  * Created by David on 08/04/2016.
  */
 public class Util {
-    public static final String DBNAME="DBNOTE";
+
+    public static final String DATE_FORMAT ="dd/MM/yyyy";
+
     public static void showMessage(Context context,String message){
         Toast.makeText(context,message,Toast.LENGTH_SHORT).show();
     }
     public static String parseDate(Date date){
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat(DATE_FORMAT);
         String fecha=null;
         try{
               fecha = sdf.format(date);

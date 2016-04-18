@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -13,8 +14,14 @@ import java.util.Date;
  * Created by David on 11/04/2016.
  */
 public class NoteSQLiteHelper extends SQLiteOpenHelper {
+
     private static NoteSQLiteHelper instance;
-    String sqlCreate ="CREATE TABLE DBNOTE (id INTEGER PRIMARY KEY AUTOINCREMENT,title TEXT,content TEXT,date TEXT)";
+
+    String sqlCreate ="CREATE TABLE "+NoteContract.TABLE_NAME+" " +
+            "("+NoteContract.COLUMN_NAME_ID+" INTEGER PRIMARY KEY AUTOINCREMENT," +
+            NoteContract.COLUMN_NAME_TITLE+" TEXT," +
+            NoteContract.COLUMN_NAME_CONTENT+" TEXT," +
+            NoteContract.COLUMN_NAME_DATE+" TEXT)";
 
     public static NoteSQLiteHelper getInstance(final Context context){
         if(instance==null){
@@ -24,7 +31,7 @@ public class NoteSQLiteHelper extends SQLiteOpenHelper {
     }
 
     public NoteSQLiteHelper(Context context) {
-        super(context, Util.DBNAME, null, 2);
+        super(context,NoteContract.TABLE_NAME, null, 3);
     }
 
     @Override
@@ -34,7 +41,7 @@ public class NoteSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS DBNOTE");
+        db.execSQL("DROP TABLE IF EXISTS "+NoteContract.TABLE_NAME);
         db.execSQL(sqlCreate);
     }
 
@@ -43,11 +50,14 @@ public class NoteSQLiteHelper extends SQLiteOpenHelper {
     public ArrayList<Note> getDBNotes(){
 
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM DBNOTE", null);
+        Cursor cursor = db.rawQuery("SELECT * FROM "+NoteContract.TABLE_NAME, null);
         ArrayList<Note> notes = new ArrayList<>();
 
         while (cursor.moveToNext()){
-            Note note = new Note(cursor.getInt(0),cursor.getString(1),cursor.getString(2),cursor.getString(3));
+            Note note = new Note(cursor.getInt(cursor.getColumnIndex(NoteContract.COLUMN_NAME_ID)),
+                                               cursor.getString(cursor.getColumnIndex(NoteContract.COLUMN_NAME_TITLE)),
+                                               cursor.getString(cursor.getColumnIndex(NoteContract.COLUMN_NAME_CONTENT)),
+                                               cursor.getString(cursor.getColumnIndex(NoteContract.COLUMN_NAME_DATE)));
             notes.add(note);
         }
         db.close();
@@ -55,13 +65,15 @@ public class NoteSQLiteHelper extends SQLiteOpenHelper {
         return notes;
     }
 
-    public void editNote(Note note){
+    public int  editNote(Note note){
+        Log.v("object recived  ",note.toString());
         SQLiteDatabase db = getReadableDatabase();
         ContentValues edited_note = new ContentValues();
         edited_note.put("content",note.getContent());
         edited_note.put("title", note.getTitle());
-        int status= db.update(Util.DBNAME,edited_note,"id = "+note.getId(),null);
+        int status= db.update(NoteContract.TABLE_NAME,edited_note,NoteContract.COLUMN_NAME_ID+" = "+note.get_id(),null);
         db.close();
+        return status;
     }
     public void addNewNote(Note note) {
         SQLiteDatabase db = getWritableDatabase();
@@ -69,7 +81,7 @@ public class NoteSQLiteHelper extends SQLiteOpenHelper {
         new_note.put("title", note.getTitle());
         new_note.put("content", note.getContent());
         new_note.put("date",Util.parseDate(new Date()));
-        db.insert("DBNOTE", null, new_note);
+        db.insert(NoteContract.TABLE_NAME, null, new_note);
         db.close();
     }
 
@@ -77,7 +89,7 @@ public class NoteSQLiteHelper extends SQLiteOpenHelper {
         int count =0;
         SQLiteDatabase db = getWritableDatabase();
         for(Note note : list_items_selected){
-            db.delete(Util.DBNAME, "id="+note.getId(), null);
+            db.delete(NoteContract.TABLE_NAME,NoteContract.COLUMN_NAME_ID+" = "+note.get_id(), null);
             count++;
         }
         db.close();

@@ -25,14 +25,13 @@ public class NoteAdapter extends ArrayAdapter<Note> {
         layoutInflater = LayoutInflater.from(getContext());
     }
 
-
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View vi=convertView;
         CustomHolder customHolder =null;
 
         if(convertView ==null){
+
             vi = layoutInflater.inflate(R.layout.note_element,parent,false);
             customHolder = new CustomHolder();
             customHolder.date =(TextView)vi.findViewById(R.id.note_creation_date);
@@ -41,7 +40,6 @@ public class NoteAdapter extends ArrayAdapter<Note> {
             vi.setTag(customHolder);
             vi.setTag(R.id.note_title, customHolder.title);
             vi.setTag(R.id.note_creation_date, customHolder.date);
-
 
         }
         else {
