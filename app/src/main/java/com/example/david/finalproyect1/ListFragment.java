@@ -1,6 +1,7 @@
 package com.example.david.finalproyect1;
 
 import android.app.AlertDialog;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -60,7 +61,8 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
         assert fab != null;
         fab.setOnClickListener(this);
-        list_items = noteSQLiteHelper.getDBNotes();
+
+        list_items = getNotes();
         noteAdapter =new NoteAdapter(getContext(),list_items);
         return view;
     }
@@ -73,31 +75,35 @@ public class ListFragment extends Fragment implements View.OnClickListener{
         listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
             @Override
             public void onItemCheckedStateChanged(ActionMode mode, int position, long id, boolean checked) {
-                mode.setTitle(getString(R.string.message_items_selected,listView.getCheckedItemCount()));
+                mode.setTitle(getString(R.string.message_items_selected, listView.getCheckedItemCount()));
                 list_items_selected.add(list_items.get(position));
             }
+
             @Override
             public boolean onCreateActionMode(ActionMode mode, Menu menu) {
                 MenuInflater menuInflater = mode.getMenuInflater();
                 menuInflater.inflate(R.menu.main, menu);
                 return true;
             }
+
             @Override
             public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
                 return false;
             }
+
             @Override
             public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.remove_option:
                         removeOption(list_items_selected);
                         mode.finish();
-                        Util.showMessage(getActivity(),getString(R.string.message_item_removed));
-                        return  true;
+                        Util.showMessage(getActivity(), getString(R.string.message_item_removed));
+                        return true;
                     default:
                         return false;
                 }
             }
+
             @Override
             public void onDestroyActionMode(ActionMode mode) {
                 list_items_selected = new ArrayList<Note>();
@@ -127,15 +133,30 @@ public class ListFragment extends Fragment implements View.OnClickListener{
     }
 
     public void addNewNote(String title,String content) {
-        noteSQLiteHelper.addNewNote(new Note(0,title,content,null));
+
+        final ContentResolver contentResolver = getActivity().getContentResolver();
+        final ContentValues new_note = new ContentValues();
+        new_note.put("title",title);
+        new_note.put("title",content);
+        new_note.put("date",Util.parseDate(new Date()));
+        contentResolver.insert(NoteContract.URI, new_note);
+
+        Log.v("agregado con ","content provider");
+
         noteAdapter.clear();
-        noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
+        noteAdapter.addAll(getNotes());
     }
 
     private void removeOption(ArrayList<Note> list_items_selected) {
-        noteSQLiteHelper.deleteNote(list_items_selected);
+
+        final ContentResolver contentResolver = getActivity().getContentResolver();
+
+        for(Note note : list_items_selected){
+            contentResolver.delete(NoteContract.URI,String.valueOf(note.get_id()),null);
+        }
+
         noteAdapter.clear();
-        noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
+        noteAdapter.addAll(getNotes());
     }
 
     @Override
@@ -169,7 +190,22 @@ public class ListFragment extends Fragment implements View.OnClickListener{
     }
     public void updateList(){
         noteAdapter.clear();
-        noteAdapter.addAll(noteSQLiteHelper.getDBNotes());
+        noteAdapter.addAll(getNotes());
+    }
+    public ArrayList<Note> getNotes(){
+        final ContentResolver contentResolver = getActivity().getContentResolver();
+        Cursor cursor = contentResolver.query(NoteContract.URI,null,null,null,null);
+        ArrayList<Note> notes = new ArrayList<>();
+
+        while (cursor.moveToNext()){
+            Note note = new Note(cursor.getInt(cursor.getColumnIndex(NoteContract.COLUMN_NAME_ID)),
+                    cursor.getString(cursor.getColumnIndex(NoteContract.COLUMN_NAME_TITLE)),
+                    cursor.getString(cursor.getColumnIndex(NoteContract.COLUMN_NAME_CONTENT)),
+                    cursor.getString(cursor.getColumnIndex(NoteContract.COLUMN_NAME_DATE)));
+            notes.add(note);
+        }
+        cursor.close();
+        return  notes;
     }
     public static interface ListFragmentInterface {
         public void onSelectedNote(final Note note);

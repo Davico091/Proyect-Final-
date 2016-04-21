@@ -17,6 +17,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <provider
+            android:authorities="com.example.david.ContentProvider"
+            android:name=".MyContentProvider"/>
     </application>
 
 </manifest>

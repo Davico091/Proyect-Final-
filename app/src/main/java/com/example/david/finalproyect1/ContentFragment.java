@@ -1,5 +1,7 @@
 package com.example.david.finalproyect1;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -69,7 +71,14 @@ public class ContentFragment extends Fragment implements View.OnClickListener{
         long id = ((Note)getArguments().getParcelable("note")).get_id();
         String title = textViewTitle.getText().toString();
         String content = textViewContent.getText().toString();
-        int status=  noteSQLiteHelper.editNote(new Note(id,title,content,""));
+
+        ContentValues edited_note = new ContentValues();
+        edited_note.put("content",content);
+        edited_note.put("title", title);
+
+        final ContentResolver contentResolver = getActivity().getContentResolver();
+        int status= contentResolver.update(NoteContract.URI, edited_note,String.valueOf(id),null);
+
         if(status>0){
             if(((MainActivity)getActivity()).isLargeView){
                 ListFragment listFragment = (ListFragment)getActivity().getSupportFragmentManager().findFragmentByTag(MainActivity.LIST_FRAGMENT_TAG);
